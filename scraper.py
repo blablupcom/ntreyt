@@ -4,6 +4,9 @@ import scraperwiki
 from datetime import datetime
 
 
+start_url = 'http://www.amazon.com/Best-Sellers-Toys-Games/zgbs/toys-and-games/ref=zg_bs_nav_0'
+
+
 def scrape(link):
     for i in xrange(1, 6):
         print (link+'?&pg={}'.format(i))
@@ -22,11 +25,12 @@ def scrape(link):
 def parse(url):
     page = requests.get(url)
     soup = bs(page.text, 'lxml')
-    asins = scrape(url)
-    for asin in asins:
-        print asin
-        today_date = str(datetime.now())
-        scraperwiki.sqlite.save(unique_keys=['Date'], data={'ASIN': asin, 'Date': today_date})
+    if url == start_url:
+        asins = scrape(url)
+        for asin in asins:
+            print asin
+            today_date = str(datetime.now())
+            scraperwiki.sqlite.save(unique_keys=['Date'], data={'ASIN': asin, 'Date': today_date})
     active_sel = soup.find('span', 'zg_selected').find_next()
     if active_sel.name == 'ul':
         links_list = active_sel.find_all('li')
@@ -42,5 +46,4 @@ def parse(url):
 
 if __name__ == '__main__':
 
-    start_url = 'http://www.amazon.com/Best-Sellers-Toys-Games/zgbs/toys-and-games/ref=zg_bs_nav_0'
     parse(start_url)
