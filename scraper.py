@@ -31,19 +31,24 @@ def parse(url):
             print asin
             today_date = str(datetime.now())
             scraperwiki.sqlite.save(unique_keys=['Date'], data={'ASIN': asin, 'Date': today_date})
-    active_sel = soup.find('span', 'zg_selected').find_next()
-    if active_sel.name == 'ul':
-        links_list = active_sel.find_all('li')
-        for link_list in links_list:
-            link = link_list.find('a')['href'].encode('utf-8')
-            asins = scrape(link)
-            for asin in asins:
-                print asin
-                today_date = str(datetime.now())
-                scraperwiki.sqlite.save(unique_keys=['Date'], data={'ASIN': asin, 'Date': today_date})
-            parse(link)
+    try:
+        active_sel = soup.find('span', 'zg_selected').find_next()
+
+        if active_sel.name == 'ul':
+            links_list = active_sel.find_all('li')
+            for link_list in links_list:
+                link = link_list.find('a')['href'].encode('utf-8')
+                asins = scrape(link)
+                for asin in asins:
+                    print asin
+                    today_date = str(datetime.now())
+                    scraperwiki.sqlite.save(unique_keys=['Date'], data={'ASIN': asin, 'Date': today_date})
+                parse(link)
+    except:
+        parse(url)
 
 
 if __name__ == '__main__':
 
     parse(start_url)
+    
